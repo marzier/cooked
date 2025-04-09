@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Challenge for Kids</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 1em 2em;
+      margin: 1em;
+      font-size: 1.2em;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #question {
+      font-size: 1.2em;
+      margin: 20px;
+      max-width: 600px;
+    }
+    .fraction {
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .fraction sup {
+      font-size: 0.6em;
+      vertical-align: super;
+    }
+    .fraction sub {
+      font-size: 0.6em;
+      vertical-align: sub;
+    }
+    .question-block {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Show your work or you are COOKED</h1>
+  <div id="question">Click the button to get your 3 problems!</div>
+  <button onclick="generateProblems()">New Problems</button>
+
+  <script>
+    function gcd(a, b) {
+      return b === 0 ? a : gcd(b, a % b);
+    }
+
+    function simplifyFraction(numerator, denominator) {
+      const common = gcd(numerator, denominator);
+      return [Math.floor(numerator / common), Math.floor(denominator / common)];
+    }
+
+    function getRandomMixedNumberHTML() {
+      let whole = Math.floor(Math.random() * 9) + 1;
+      let numerator = Math.floor(Math.random() * 9) + 1;
+      let denominator = Math.floor(Math.random() * 9) + 1;
+
+      while (numerator % denominator === 0) {
+        numerator = Math.floor(Math.random() * 9) + 1;
+        denominator = Math.floor(Math.random() * 9) + 1;
+      }
+
+      let improperNumerator = whole * denominator + numerator;
+      let simplifiedNumerator = improperNumerator % denominator;
+      let newWhole = Math.floor(improperNumerator / denominator);
+      [simplifiedNumerator, denominator] = simplifyFraction(simplifiedNumerator, denominator);
+
+      if (simplifiedNumerator === 0 || denominator === 0) {
+        return getRandomMixedNumberHTML();
+      } else {
+        return `${newWhole} <span class="fraction"><sup>${simplifiedNumerator}</sup>&frasl;<sub>${denominator}</sub></span>`;
+      }
+    }
+
+    function getRandomDecimalWithMaxDigits(maxDigits, decimalPlaces) {
+      const max = Math.pow(10, maxDigits) - 1;
+      return parseFloat((Math.random() * max).toFixed(decimalPlaces));
+    }
+
+    function toMixedNumberString(value) {
+      const whole = Math.floor(value);
+      const frac = value - whole;
+      const denominator = 10;
+      const numerator = Math.round(frac * denominator);
+      const [simpleNum, simpleDen] = simplifyFraction(numerator, denominator);
+      return `${whole} <span class="fraction"><sup>${simpleNum}</sup>&frasl;<sub>${simpleDen}</sub></span>`;
+    }
+
+    function generateCleanDivision() {
+      const decimalParts = [0, 0.2, 0.4, 0.5, 0.75];
+      const validTenths = [0.1, 0.2, 0.25, 0.5];
+      const wholePart = Math.floor(Math.random() * 10) + 1;
+      const quotient = wholePart + decimalParts[Math.floor(Math.random() * decimalParts.length)];
+
+      let divisor;
+      do {
+        const wholeDivisor = Math.floor(Math.random() * 9) + 1;
+        const decimal = validTenths[Math.floor(Math.random() * validTenths.length)];
+        divisor = parseFloat((wholeDivisor + decimal).toFixed(2));
+      } while (divisor % 1 === 0);
+
+      const dividend = parseFloat((divisor * quotient).toFixed(2));
+      return { dividend, divisor, quotient };
+    }
+
+    function generateSingleProblem() {
+      const type = Math.floor(Math.random() * 7) + 1;
+      let problemText = "";
+
+      if (type === 1) {
+        const side1 = getRandomMixedNumberHTML();
+        const side2 = getRandomMixedNumberHTML();
+        problemText = `Find the area of a rectangle with sides ${side1} units and ${side2} units.`;
+      } else if (type === 2) {
+        const side1 = getRandomMixedNumberHTML();
+        const side2 = getRandomMixedNumberHTML();
+        problemText = `Find the perimeter of a rectangle with sides ${side1} units and ${side2} units.`;
+      } else if (type === 3) {
+        const num1 = getRandomMixedNumberHTML();
+        const num2 = getRandomMixedNumberHTML();
+        const num3 = getRandomMixedNumberHTML();
+        problemText = `Estimate the value of this expression: ${num1} + ${num2} - ${num3}`;
+      } else if (type === 4) {
+        const num1 = getRandomMixedNumberHTML();
+        const num2 = getRandomMixedNumberHTML();
+        const operation = Math.random() < 0.5 ? "+" : "×";
+        problemText = `What is ${num1} ${operation} ${num2}?`;
+      } else if (type === 5) {
+        const { dividend, divisor, quotient } = generateCleanDivision();
+        const mixed = toMixedNumberString(quotient);
+        problemText = `Divide ${dividend} by ${divisor}. What is the answer as a mixed number and as a decimal?`;
+      } else if (type === 6) {
+        const num1 = getRandomDecimalWithMaxDigits(3, Math.random() < 0.5 ? 1 : 2);
+        const num2 = getRandomDecimalWithMaxDigits(2, Math.random() < 0.5 ? 1 : 2);
+        const product = num1 * num2;
+        problemText = `Multiply ${num1} × ${num2}. What is the product?`;
+      } else if (type === 7) {
+        const num1 = getRandomMixedNumberHTML();
+        const num2 = getRandomMixedNumberHTML();
+        problemText = `What is ${num1} minus ${num2}?`;
+      }
+
+      return `<div class="question-block">${problemText}</div>`;
+    }
+
+    function generateProblems() {
+      let allQuestions = "";
+      for (let i = 0; i < 3; i++) {
+        allQuestions += generateSingleProblem();
+      }
+      document.getElementById('question').innerHTML = allQuestions;
+    }
+  </script>
+</body>
+</html>
